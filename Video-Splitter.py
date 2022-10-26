@@ -19,16 +19,21 @@ def get_video_length(filename):
 
 def ceildiv(a, b):
     return int(math.ceil(a / float(b)))
+def floordiv(a, b):
+    return int(math.floor(a / float(b)))
 
 def split_by_seconds(filename, split_length, vcodec="copy", acodec="copy",
-                     extra="", video_length=None, **kwargs):
+                     is_equal_len=False, extra="", video_length=None, **kwargs):
     if split_length and split_length <= 0:
         print("Split length can't be 0")
         raise SystemExit
 
     if not video_length:
         video_length = get_video_length(filename)
-    split_count = ceildiv(video_length, split_length)
+    if not is_equal_len:
+        split_count = ceildiv(video_length, split_length)
+    else:
+        split_count = floordiv(video_length, split_length)
     if split_count == 1:
         print("Video length is less then the target split length.")
         raise SystemExit
@@ -75,7 +80,7 @@ def main():
                       action="store"
                       )
                       
-    parser.add_option("--root",
+    parser.add_option("-r", "--root",
                       dest="root_dir",
                       help="Root directory of videos, where they are saved",
                       type="string",
@@ -97,7 +102,17 @@ def main():
                       default="",
                       action="store"
                       )
+#     parser.add_option("-q", "--quiet",
+#                       action="store_true", 
+#                       dest="is_quiet", 
+#                       default=False,
+#                       help="don't print status messages to stdout")
     
+    parser.add_option('--equal-len',
+                      action="store_true", 
+                      dest="is_equal_len", 
+                      default=False,
+                      help="ignore the last split if it's less than desired seconds")
     
     # getting the arguments
     (options, args) = parser.parse_args()
@@ -124,14 +139,18 @@ def main():
                  'M4V', 'AVI', 'WMV',
                  'MOV', 'QT', 'FLV',
                  'SWF', 'AVCHD')
+    
     # Looping through files of our directory to trim the videos
     # Note: The "out" folder should be made before the code
-    
     for file in os.listdir(root_dir):
         fileext = file.split(".")[-1]
         print(fileext,' , ',file)
         if (fileext.upper() in video_formats):
-            split_by_seconds(root_dir+'/'+file,options.split_length,vcodec = options.vcodec , extra = options.extra)
+            split_by_seconds(root_dir+'/'+file, 
+                             options.split_length, 
+                             vcodec = options.vcodec, 
+                             is_equal_len = options.is_equal_len, 
+                             extra = options.extra)
 
     
     
