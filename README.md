@@ -12,7 +12,7 @@ To run the code try shell commands:
 After running the command, a 'out' folder in the root directory will be made, and the splitted videos will be saved there.
 
 ### Stop FFmpeg from showing output
-To stop the FFmpeg outputs, just add the extra argument `-e '-loglevel quiet'`. This option will be added soon for the code.
+To stop the FFmpeg outputs, just add the extra argument `-e '-loglevel quiet'`.
 
 
 ### Same Video Length
