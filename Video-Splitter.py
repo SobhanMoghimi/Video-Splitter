@@ -57,6 +57,8 @@ def split_by_seconds(filename, split_length, vcodec="copy", acodec="copy",
         
         
 def main():
+    
+    # Argument Parser, Made for running the code in command-line
     parser = OptionParser()
     
     parser.add_option("-f", "--file",
@@ -97,28 +99,38 @@ def main():
                       )
     
     
-    
-    
+    # getting the arguments
     (options, args) = parser.parse_args()
     
+    #bailout function in case of errors
     def bailout():
         parser.print_help()
         raise SystemExit
 
         
         
-        
+    # We Set the root directory. If it is not mentioned,
+    # The Current Directory will be set.
     video_length = None
     print(options.root_dir)
     root_dir = options.root_dir
     if root_dir == '':
         root_dir = os.getcwd()
    
-  
+    # Tuple of video formats to check in directory.
+    video_formats = ('WEBM', 'MPG', 'MP2',
+                 'MPEG', 'MPE', 'MPV',
+                 'OGG', 'MP4', 'M4P',
+                 'M4V', 'AVI', 'WMV',
+                 'MOV', 'QT', 'FLV',
+                 'SWF', 'AVCHD')
+    # Looping through files of our directory to trim the videos
+    # Note: The "out" folder should be made before the code
+    
     for file in os.listdir(root_dir):
         fileext = file.split(".")[-1]
         print(fileext,' , ',file)
-        if(fileext=='avi' or fileext=='mp4'):
+        if (fileext.upper() in video_formats):
             split_by_seconds(root_dir+'/'+file,options.split_length,vcodec = options.vcodec , extra = options.extra)
 
     
