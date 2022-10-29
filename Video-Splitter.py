@@ -4,6 +4,7 @@ import csv
 import json
 import math
 import os
+import time
 import shlex
 import subprocess
 from optparse import OptionParser
@@ -34,11 +35,9 @@ def split_by_seconds(filename, split_length, vcodec="copy", acodec="copy",
         split_count = ceildiv(video_length, split_length)
     else:
         split_count = floordiv(video_length, split_length)
-    if split_count == 1:
-        print("Video length is less then the target split length.")
-        raise SystemExit
-
-    split_cmd = ["ffmpeg", "-i", filename, "-vcodec", vcodec, "-acodec", acodec] + shlex.split(extra)
+        if (video_length < split_length):
+            return filename
+    split_cmd = ["ffmpeg", "-i", filename, "-vcodec", vcodec, "-acodec", acodec] + shlex.split(extra)        
     try:
         filebase_list = filename.split('/')
         filefolder = '/'.join(filebase_list[:-1])
@@ -59,6 +58,7 @@ def split_by_seconds(filename, split_length, vcodec="copy", acodec="copy",
                        str(split_count) + "." + fileext]
         print("About to run: " + " ".join(split_cmd + split_args))
         subprocess.check_output(split_cmd + split_args)
+        return "success"
         
         
 def main():
@@ -142,15 +142,27 @@ def main():
     
     # Looping through files of our directory to trim the videos
     # Note: The "out" folder should be made before the code
+    # The unsuccessful_videos is for the videos that are smaller than the given size in --equal-len mode!
+    unsuccessful_videos = []
     for file in os.listdir(root_dir):
         fileext = file.split(".")[-1]
         print(fileext,' , ',file)
         if (fileext.upper() in video_formats):
-            split_by_seconds(root_dir+'/'+file, 
+            res = split_by_seconds(root_dir+'/'+file, 
                              options.split_length, 
                              vcodec = options.vcodec, 
                              is_equal_len = options.is_equal_len, 
                              extra = options.extra)
+            if(res != "success"):
+            	unsuccessful_videos.append(res)
+    print( '\033[93m' + "Warning: Below videos are smaller than the desired size for --equal-len and not processed." + '\033[0m')
+    time.sleep(2)
+    for st in unsuccessful_videos:
+    	print('\033[94m'+st+'\033[0m')
+    	time.sleep(0.05)
+
+
+       
 
     
     
