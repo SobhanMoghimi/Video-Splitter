@@ -31,6 +31,7 @@ def split_by_seconds(filename, split_length, vcodec="copy", acodec="copy",
 
     if not video_length:
         video_length = get_video_length(filename)
+        
     if not is_equal_len:
         split_count = ceildiv(video_length, split_length)
     else:
@@ -58,7 +59,8 @@ def split_by_seconds(filename, split_length, vcodec="copy", acodec="copy",
                        str(split_count) + "." + fileext]
         print("About to run: " + " ".join(split_cmd + split_args))
         subprocess.check_output(split_cmd + split_args)
-        return "success"
+    return "success"
+       	
         
         
 def main():
